@@ -1,0 +1,86 @@
+<!doctype html>
+<html >
+<head>
+    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="" />
+    <!-- !CSS -->
+    <link href="css/style.css" rel="stylesheet" />
+    <link href="libs/ol3121/css/ol.css" rel="stylesheet" />
+    <link href="libs/jquery/jquery.page.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="libs/bootstrap.min.css">
+    <script src="libs/jquery/jquery-2.1.4.min.js"></script>
+    <script src="libs/jquery/jquery.page.js"></script>
+    <script src="libs/ol3121/js/ol-debug.js"></script>
+    <script src="libs/bootstrap.min.js"></script>
+    <script src="js/common.js"></script>
+    <style>
+/*    .ol-mouse-position {
+        top: 0px;
+        right: -100px;
+        position: absolute;
+        padding: 0px 1px;
+        width:100%;
+    }*/
+.tooltip {
+        position: relative;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 4px;
+        color: white;
+        padding: 4px 8px;
+        opacity: 0.7;
+        white-space: nowrap;
+      }
+      .tooltip-measure {
+        opacity: 1;
+        font-weight: bold;
+      }
+      .tooltip-static {
+        background-color: #ffcc33;
+        color: black;
+        border: 1px solid white;
+      }
+      .tooltip-measure:before,
+      .tooltip-static:before {
+        border-top: 6px solid rgba(0, 0, 0, 0.5);
+        border-right: 6px solid transparent;
+        border-left: 6px solid transparent;
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        margin-left: -7px;
+        left: 50%;
+      }
+      .tooltip-static:before {
+        border-top-color: #ffcc33;
+      }   
+    </style>
+</head>
+
+<body>
+    <div id="map" class="map" tabindex="0">
+        <div id="popup"></div>
+      <!--  <div id="location"></div>
+        <div id="zoom"></div>-->
+       
+    </div>
+
+     <div id="toolbar" style="position:absolute;left:10px;top:80px">
+        <img id="disBtn" src="images/distance_measure.png" title="测距" style="cursor:pointer"/>            
+    </div>
+   
+    <div id="debugDiv" style="position:absolute;left:44px;top:4px">
+            <button id="debug_locate" >测试-API定位</button>
+            <button id="debug_addIcon" >测试-添加图片点</button>
+    </div>
+  <!--   <div class="piex">
+        <a id="zoomin"><img src="./images/zoomin64.png" /></a>
+        <a id="zoomout"><img src="./images/zoomout64.png" /></a>
+    </div> -->
+</body>
+
+</html>
