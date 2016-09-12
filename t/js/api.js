@@ -3,22 +3,167 @@
 var view = map.getView();
 var zoom = new ol.control.Zoom();
 map.addControl(zoom);
+var markActivated = false;
+var sourceProj = map.getView().getProjection();
+  /**
+       * Elements that make up the popup.
+       */
+      var container = document.getElementById('popup');
+      var content = document.getElementById('popup-content');
+      var closer = document.getElementById('popup-closer');
 
+      /**
+       * Create an overlay to anchor the popup to the map.
+       */
+      var overlay = new ol.Overlay(/** @type {olx.OverlayOptions} */ {
+        element: container,
+        autoPan: true,
+        autoPanAnimation: {
+          duration: 250
+        }
+      });
+
+map.addOverlay(overlay);
+
+      /**
+       * Add a click handler to hide the popup.
+       * @return {boolean} Don't follow the href.
+       */
+      closer.onclick = function(){
+        closePopup();
+      }
+
+      function closePopup() {
+        overlay.setPosition(undefined);
+        closer.blur();
+        return false;
+      };
 // 页面功能
-$('#disBtn').on('click', function(){
+$('#debug_activeDistance').on('click', function(){
   if(!measureActivated){
     addInteraction();
     map.on('pointermove', pointerMoveHandler);
     measureActivated = true;
+    $('#debug_activeDistance').text("测试-关闭测距");
   }else{
     map.removeInteraction(draw);
     map.un('pointermove', pointerMoveHandler);
     meatureSource.clear();
     $('.tooltip-static').remove()
     measureActivated = false;
+    $('#debug_activeDistance').text("测试-激活测距");
   }
   
 });
+
+$('#debug_mark').on('click', function(){
+  if(!markActivated){
+    map.on('singleclick', markPlace);
+    markActivated = true;
+    $('#debug_mark').text("测试-关闭标记");
+  }else{
+    map.un('singleclick', markPlace);
+    markActivated = false;
+    $('#debug_mark').text('测试-激活标记');
+  }
+})
+
+$('#btnSignSave').on('click', function(){
+  var titleInfo = $('#us_infoWnd_title').val();
+  var remarkInfo = $('#us_infoWnd_remark').val();
+  var coordinate = overlay.getPosition();
+  // var geopoint = ol.proj.transform(MapManger.rat_ori(coordinate), sourceProj, 'EPSG:4326');
+  var iconFeature = new ol.Feature(new ol.geom.Point(coordinate));
+  iconFeature.set('style', createStyle('images/pin_red.png', undefined));
+  markSource.addFeature(iconFeature);
+  iconFeature.setProperties({
+    title:titleInfo,
+    remark:remarkInfo
+  })
+  delLbl = createLabelOverlay(coordinate, titleInfo);
+  closePopup();
+})
+
+$('#btnSignDelete').on('click', function(){
+  closePopup();
+  
+  if(delMark){
+    markSource.removeFeature(delMark);
+    delMark = null;
+  }
+  if(delLbl){
+    delLbl.parentElement.removeChild(delLbl);
+  }
+})
+
+function createLabelOverlay(coord, title) {
+  if(!title){
+    return;
+  }
+  var lblEle = document.createElement('div');
+   lblEle.className = 'labeltip';
+  var lblOverlay = new ol.Overlay({
+    element: lblEle,
+    offset: [0, -25],
+    positioning: 'bottom-center'
+  });
+  lblEle.innerHTML = title;
+  lblOverlay.setPosition(coord);
+  map.addOverlay(lblOverlay);
+  return lblEle;
+}
+
+
+var delMark;
+var delLbl;
+  var markSource = new ol.source.Vector();
+  var markLayer = new ol.layer.Vector({
+    style: function(feature){
+      return feature.get('style');
+    },
+    source: markSource
+  })
+
+  map.getLayers().push(markLayer);   
+function markPlace(evt){
+  // console.log(evt)
+  // var geopoint = ol.proj.transform(MapManger.rat_ori(evt.coordinate), sourceProj, 'EPSG:4326');
+  // var iconFeature = new ol.Feature(new ol.geom.Point(evt.coordinate));
+  // iconFeature.set('style', createStyle('images/pin_red.png', undefined));
+  // markSource.addFeature(iconFeature);
+       $('#us_infoWnd_title').val('');
+       $('#us_infoWnd_remark').val('');
+       var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer){
+          return feature;
+        });
+       if(feature){
+          var titleInfo = feature.get('title');
+          var remarkInfo = feature.get('remark');
+          $('#us_infoWnd_title').val(titleInfo);
+          $('#us_infoWnd_remark').val(remarkInfo);  
+          delMark = feature;
+       }
+       var coordinate = evt.coordinate;
+       var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
+        coordinate, 'EPSG:3857', 'EPSG:4326'));
+       // content.innerHTML = '<p>You clicked here:</p><code>' + hdms +
+         //   '</code>';
+        overlay.setPosition(coordinate);
+        
+}
+
+function createStyle(src, img) {
+  return new ol.style.Style({
+    image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+      anchor: [0.5, 0.96],
+      src: src,
+      img: img,
+      imgSize: img ? [img.width, img.height] : undefined
+    }))
+  });
+}
+
+
 
 /**
  * The help tooltip element.
@@ -257,7 +402,7 @@ function createMeasureTooltip() {
 
 // 单击事件
 map.on('singleclick', function(evt){
-      if(measureActivated){
+      if(measureActivated || markActivated){
         return;
       }
       var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer){
@@ -270,7 +415,7 @@ map.on('singleclick', function(evt){
 
 // 双击事件
 map.on('dblclick', function(evt){
-     if(measureActivated){
+     if(measureActivated || markActivated){
         return;
       }
       var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer){

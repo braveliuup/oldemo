@@ -161,18 +161,18 @@ var measureActivated = false;
 				//})
             });
 
+
+     //      image: new ol.style.Icon({
+    	//       anchor: [0.5, 46],
+     //    	  anchorXUnits: 'fraction',
+     //      	  anchorYUnits: 'pixels',
+     //      	  opacity: 0.75,
+     //          src: 'data/icon.png'
+    	// })
 	    var defaultStyle = new ol.style.Style({
 					 		fill: new ol.style.Fill({
 			       				color: 'rgba(255,33,33,0.0)'
-			       			}),
-			       			
-					          image: new ol.style.Icon({
-					    	      anchor: [0.5, 46],
-					        	  anchorXUnits: 'fraction',
-					          	  anchorYUnits: 'pixels',
-					          	  opacity: 0.75,
-					              src: 'data/icon.png'
-				        	})
+			       			})
 					 	});
 	   	var lastHigthLightFeature ;
 	    map.on('pointermove', function(e){
@@ -182,21 +182,22 @@ var measureActivated = false;
 		       }
 	    		return;
 	    	}
-	    	 if(e.dragging){
-	         $(element).popover('destroy');// 疑问
-		        return;
-		      }
+	    	// if(e.dragging){
+	     //   	    $(element).popover('destroy');// 疑问
+		    //     return;
+		    // }
 		      var pixel = map.getEventPixel(e.originalEvent);
 		      var hit = map.hasFeatureAtPixel(pixel);
 		      map.getTarget().style.cursor = hit ? 'pointer' : '';
 		      // console.log(ol.proj.transform(e.coordinate, "EPSG:3857", 'EPSG:4326'));
-		       var feature = map.forEachFeatureAtPixel(e.pixel, function(feature, layer){
+		      var feature = map.forEachFeatureAtPixel(e.pixel, function(feature, layer){
 		        return feature;
 		      });
 		       if(lastHigthLightFeature){
 		       	lastHigthLightFeature.setStyle(defaultStyle);
 		       }
-		       if(feature ){
+		       // console.log(feature.getGeometry().getType())
+		       if(feature && feature.getGeometry().getType() == "Polygon"){
 		       		lastHigthLightFeature = feature;
 		       		feature.setStyle(
 		       			new ol.style.Style({
@@ -206,28 +207,14 @@ var measureActivated = false;
 			       			stroke: new ol.style.Stroke({
 			       				color: '#ffcc33',
 			       				width: 2
-			       			}),
-					          image: new ol.style.Icon({
-					    	      anchor: [0.5, 46],
-					        	  anchorXUnits: 'fraction',
-					          	  anchorYUnits: 'pixels',
-					          	  opacity: 0.75,
-					              src: 'data/icon.png'
-				        	})
+			       			})
 		       			})
 	       			);
 		       }
 	    });
 
-	    var element = document.getElementById('popup');
 
-	    var popup = new ol.Overlay({
-	      element: element,
-	      positioning: 'bottom-center',
-	      stopEvent: false
-	    });
-
-	    map.addOverlay(popup);
+	
 		
 		
 	    // display popup on click
@@ -243,8 +230,6 @@ var measureActivated = false;
 	    //       'content': '<html><h4>'+(feature.get('JID')==''?'信息未录入':feature.get('JID'))+
 	    //       '</h4><img width="120" height="120" src="data/title.png"/><br><div style="width:300px;">地址:'+(feature.get('Address')==''?'信息未录入':feature.get('Address'))+'</div></html>'
 	    //     });
-	    //     console.log(feature)
-	    //     console.log($(element))
 	    //     $(element).popover('show');
 	    //   }else{
 	    //     $(element).popover('destroy');
