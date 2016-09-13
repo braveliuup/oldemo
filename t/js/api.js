@@ -462,6 +462,22 @@ function ExLocate(lon, lat, zoom){
   	view.setCenter(center);
 }
 
+function ExAddLabel(lon, lat, text){
+  var pos = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
+  var coord = MapManger.ori_rat(pos);
+
+  var lblEle = document.createElement('div');
+  lblEle.className = 'labeltip';
+  var lblOverlay = new ol.Overlay({
+    element: lblEle,
+    offset: [0, -25]
+  });
+  lblEle.innerHTML = text;
+  lblOverlay.setPosition(coord);
+  map.addOverlay(lblOverlay);
+  return lblEle;
+}
+
 //////////////本地测试//////////////////////// 
 
 // 添加图片测试
@@ -476,3 +492,8 @@ $("#debug_locate").on('click', function(){
     ExLocate(lon, lat, zoom);// api 定位接口
 })
 
+// 添加标注
+$('#debug_label').on('click', function(){
+    var lon = 108.90536, lat = 34.28138, text="腾讯大厦";
+    ExAddLabel(lon, lat, text);
+})
