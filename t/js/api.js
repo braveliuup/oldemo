@@ -56,6 +56,107 @@ $('#debug_activeDistance').on('click', function(){
   
 });
 
+$('#debug_addLayer').on('click', function(){
+  addLayer('测试图层')
+});
+var layerManager = {};
+function addLayer(name){
+  if(layerManager[name] != null){
+    alert("图层名称不能重复");
+    return;
+  }
+  var layer = new ol.layer.Vector({
+    style: function(feature){
+      return feature.get('style');
+    },
+    source: new ol.source.Vector()
+  })
+  map.getLayers().push(layer);   
+  
+  layerManager[name] = layer;
+  $('#layerDiv').append("<div id='"+name+"'>"+name+"</div>");
+}
+
+function removeLayer(name){
+  var layer = layerManager[name];
+  map.removeLayer(layer);
+  layerManager[name] = null;
+  $('#'+name).remove(); 
+}
+
+function showLayer(name){
+  var layer = layerManager[name];
+  layer.setVisible(true);
+}
+
+function hideLayer(name){
+  var layer = layerManager[name];
+  layer.setVisible(false);
+}
+
+var labelLayerManager = {};
+function addLabelLayer(name){
+  labelLayerManager[name] = [];
+}
+
+function addImageOnLayer(layerName, lon, lat){
+  var coord = geo2edsWorld(lon, lat);
+  var iconFeature = new ol.Feature(new ol.geom.Point(coord));
+  iconFeature.set('style', createStyle('images/pin_red.png', undefined));
+  var layer = layerManager[layerName];
+  layer.getSource().addFeature(iconFeature);
+}
+
+function addLabelOnLayer(layerName, lon, lat, text){
+ var coord = geo2edsWorld(lon, lat);
+  var lblEle = document.createElement('div');
+  lblEle.className = 'labeltip '+layerName;
+  var lblOverlay = new ol.Overlay({
+    element: lblEle,
+    offset: [0, -25]
+  });
+  lblEle.innerHTML = text;
+  lblOverlay.setPosition(coord);
+  map.addOverlay(lblOverlay);
+  return lblEle;
+}
+
+function hideLabelOnLayer(layerName){
+  $('.'+layerName).addClass('hideElement');
+}
+
+function showLabelOnLayer(layerName){
+  $('.'+layerName).removeClass('hideElement');
+}
+
+$('#debug_addImageOnLayer').on('click', function(){
+  addImageOnLayer('测试图层', 108.905, 34.281);
+});
+
+$('#debug_addLabelOnLayer').on('click', function(){
+  addLabelOnLayer('测试图层', 108.905, 34.2814, '搜狐大厦');
+});
+
+$('#debug_hideLabelOnLayer').on('click', function(){
+  hideLabelOnLayer('测试图层');
+});
+
+$('#debug_showLabelOnLayer').on('click', function(){
+  showLabelOnLayer('测试图层');
+});
+
+$('#debug_removeLayer').on('click', function(){
+  removeLayer('测试图层');
+});
+
+$('#debug_showLayer').on('click', function(){
+  showLayer('测试图层');
+});
+
+$('#debug_hideLayer').on('click', function(){
+  hideLayer('测试图层');
+});
+
 $('#debug_mark').on('click', function(){
   if(!markActivated){
     map.on('singleclick', markPlace);
@@ -426,6 +527,12 @@ map.on('dblclick', function(evt){
       }
 });
 
+// 坐标转换
+function geo2edsWorld(lon, lat){
+    var pos = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
+    var center = MapManger.ori_rat(pos);
+    return center;
+}
 
 // 接口 加载图标 参数：经度，纬度，图片地址url，名称，地址
 function ExAddIcon(lon, lat, picUrl, jid, name, address){

@@ -111,6 +111,10 @@
       .ol-popup-closer:after {
         content: "X";
       }
+
+      .hideElement{
+        display: none;
+      }
     </style>
 </head>
 
@@ -150,6 +154,25 @@
             <button id="debug_activeDistance">测试-激活测距</button>
             <button id="debug_mark">测试-激活标记</button>
             <button id="debug_label">测试-添加标注</button>
+            <br/>
+            <div  style="background-color:aliceblue">
+                测试-图层管理
+                <br>
+                <button id="debug_addLayer">添加图层</button>
+                <button id="debug_removeLayer">删除图层</button>
+                <button id="debug_hideLayer">隐藏图层</button>
+                <button id="debug_showLayer">显示图层</button>
+                <button id="debug_addImageOnLayer">增加图片点</button>
+                <br>
+                图片图层与标注点图层是不同类型的图层。要分开加载
+                <br>
+                <button id="debug_addLabelOnLayer">增加文本标注点</button>
+                <button id="debug_hideLabelOnLayer">隐藏文本标注点</button>
+                <button id="debug_showLabelOnLayer">显示文本标注点</button>
+                <div id='layerDiv'>
+                    
+                </div>
+            </div>
     </div>
 
     <label>asdfdsalfkj</label>
