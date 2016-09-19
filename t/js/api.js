@@ -56,6 +56,26 @@ $('#debug_activeDistance').on('click', function(){
   
 });
 
+$('#debug_2dot5d').on('click', function(){
+    var c = ol.proj.transform([108.90536,  34.28138], 'EPSG:4326', 'EPSG:3857');
+    var center = MapManger.ori_rat(c);
+    tianDiTuLayer.setVisible(false);
+    tianDiTuLayer_label.setVisible(false);
+    eDuShiLayer.setVisible(true);
+    map.getView().setZoom(19);
+    map.getView().setCenter(center);
+})
+
+$('#debug_2d').on('click', function(){
+  var coor = ol.proj.transform([116.40969, 39.89945], 'EPSG:4326', 'EPSG:3857');
+  tianDiTuLayer.setVisible(true);
+  tianDiTuLayer_label.setVisible(true);
+  eDuShiLayer.setVisible(false);
+  map.getView().setZoom(13);
+  map.getView().setCenter(coor);
+
+})
+
 $('#debug_addLayer').on('click', function(){
   addLayer('测试图层')
 });

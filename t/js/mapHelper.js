@@ -3,8 +3,31 @@
 //地图相关操作类
 var MapManger = {};
 var measureActivated = false;
+var tianDiTuLayer;
+var tianDiTuLayer_label;
+var eDuShiLayer;
 (function (o) {
    
+   	o.loadXYZLayerTiandDiTu = function(){
+   		var layer = new ol.layer.Tile({
+   			source: new ol.source.XYZ({
+   				 url: "http://t2.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}"
+   			}),
+   			visible: false
+   		});
+   		return layer;
+   	}
+
+ 	o.loadXYZLayerTiandDiTu_label = function(){
+   		var layer = new ol.layer.Tile({
+   			source: new ol.source.XYZ({
+   				 url: "http://t2.tianditu.com/DataServer?T=cva_w&x={x}&y={y}&l={z}"
+   			}),
+   			visible: false
+   		});
+   		return layer;
+   	}
+
     o.loadXYZLayerCustom = function () {
         var source = new ol.source.XYZ({
           
@@ -102,6 +125,10 @@ var measureActivated = false;
 	        })
 	      });
 	 
+	 	tianDiTuLayer = o.loadXYZLayerTiandDiTu();
+	 	tianDiTuLayer_label = o.loadXYZLayerTiandDiTu_label();
+	 	eDuShiLayer = o.loadXYZLayerCustom();
+
 	    map = new ol.Map({
 	        interactions: ol.interaction.defaults({
 	            doubleClickZoom: false,
@@ -110,7 +137,7 @@ var measureActivated = false;
 	        }),
 	        target: document.getElementById('map'),
 	        layers: [
-	            o.loadXYZLayerCustom(),vector
+	            eDuShiLayer,tianDiTuLayer,tianDiTuLayer_label,vector
 	            //, o.createChinaGrid()
 	        ],
 	        view: new ol.View({

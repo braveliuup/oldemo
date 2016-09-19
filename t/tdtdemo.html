@@ -1,0 +1,53 @@
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="" />
+    <!-- !CSS -->
+    <link href="css/style.css" rel="stylesheet" />
+    <link href="libs/ol3121/css/ol.css" rel="stylesheet" />
+    <link href="libs/jquery/jquery.page.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="libs/bootstrap.min.css">
+    <script src="libs/jquery/jquery-2.1.4.min.js"></script>
+    <script src="libs/jquery/jquery.page.js"></script>
+    <script src="libs/ol3121/js/ol-debug.js"></script>
+    <script src="libs/bootstrap.min.js"></script>
+</head>
+<body>
+    <div id="map" class="map" tabindex="0">
+    </div>
+
+<script>
+var attribution = new ol.Attribution({
+    html: '© <a href="http://www.chinaonmap.com/map/index.html">天地图</a>'
+});
+var coor = ol.proj.transform([116.40969, 39.89945], 'EPSG:4326', 'EPSG:3857');
+var view = new ol.View({
+    center: coor,
+    zoom: 13
+});
+var map = new ol.Map({
+    target: 'map',
+    layers: [
+        new ol.layer.Tile({
+            source: new ol.source.XYZ({
+                attributions: [attribution],
+                url: "http://t2.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}"
+            })
+        }),
+        new ol.layer.Tile({
+            source: new ol.source.XYZ({
+                url: "http://t2.tianditu.com/DataServer?T=cva_w&x={x}&y={y}&l={z}"
+            })
+        })
+    ],
+    view: view
+});
+</script>
+</body>
+
+</html>
