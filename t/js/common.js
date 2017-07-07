@@ -24,17 +24,17 @@ $.cachedScript = function (url, options) {
 };
 
 //初始化JS文件
-$(function () {
-    $.getScript("js/config.js", function () {
-        $.getScript("js/mapHelper.js", function () {
-            $.getScript("js/init.js", function (data, textStatus, jqxhr) {
-                $.getScript("js/api.js", function () {
+// $(function () {
+//     $.getScript("js/config.js", function () {
+//         $.getScript("js/mapHelper.js", function () {
+//             $.getScript("js/init.js", function (data, textStatus, jqxhr) {
+//                 $.getScript("js/api.js", function () {
                     
-                });
-            });
-        });
-    });
-});
+//                 });
+//             });
+//         });
+//     });
+// });
 
 
 

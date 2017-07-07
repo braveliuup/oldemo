@@ -7,46 +7,6 @@ var tianDiTuLayer;
 var tianDiTuLayer_label;
 var eDuShiLayer;
 var wfsLayer;
-var projection  = ol.proj.get('EPSG:4326');
-var origin = [-400.0, 400];
-var resolutions = [
-	0.7031250000029744,
-	0.3515625000014872,
-	0.1757812499888463,
-	0.08789062499442316,
-	0.04394531250910888,
-	0.021972656242657134,
-	0.010986328121328567,
-	0.00549316407256159,
-	0.0027465820243834896,
-	0.0013732910240890498,
-	6.866455120445249E-4,
-	3.433227441249574E-4,
-	1.7166138395978374E-4,
-	8.583068008258684E-5,
-	4.291534004129342E-5,
-	2.145767002064671E-5,
-	9.658089455004757E-6,
-	5.364423453814192E-6,
-	2.682199829602067E-6,
-	1.3411118121060625E-6,	
-]
-var tileGrid = new ol.tilegrid.TileGrid({
-	tileSize: 256,
-	origin: origin,
-	resolutions: resolutions
-});
-
-var highLightVecSource = new ol.source.Vector();
-var highLightVecLayer = new ol.layer.Vector({
-	source: highLightVecSource,
-	style: new ol.style.Style({
-		fill: new ol.style.Fill({
-			color: 'rgba(255, 0, 0, .5)'
-		})
-	})
-});
-
 (function (o) {
 	
    	o.loadXYZLayerTiandDiTu = function(){
@@ -71,6 +31,7 @@ var highLightVecLayer = new ol.layer.Vector({
 
     o.loadXYZLayerCustom = function () {
         var source = new ol.source.XYZ({
+          
             wrapX: false,
             projection: ol.proj.get("EPSG:3857"),
             tileUrlFunction: function (tileCoord, pixelRatio, proj) {
@@ -95,19 +56,7 @@ var highLightVecLayer = new ol.layer.Vector({
     };
 
 	o.loadNewEduShiLayer = function () {
-		var source = new ol.source.TileImage({
-			projection: projection,
-			tileGrid: tileGrid,
-			tileUrlFunction: function (tileCoord, pixelRatio, proj) {
-				var z = o.zeroPad(tileCoord[0], 2, 10);
-				var x = o.zeroPad(tileCoord[1], 8, 16);
-				var y = o.zeroPad(-tileCoord[2] - 1, 8, 16);
-				return "http://localhost:8080/oldemo/hmp0-19/" + "L" + z + "/" + "R" + y + "/" + "C" + x + ".png";
-			}
-		});
-		return new ol.layer.Tile({
-			source: source
-		});
+		
 	}
 
 	o.zeroPad = function zeroPad(num, len, radix) {
@@ -130,7 +79,21 @@ var highLightVecLayer = new ol.layer.Vector({
     }
     //地图初始化
     o.init = function () {
-        var mp = new ol.control.MousePosition();
+        //debugger;
+        var c = ol.proj.transform(GlobalObj.map.center, 'EPSG:4326', 'EPSG:3857');
+      //  console.log("3857---", c);
+        var center = o.ori_rat(c);
+      //  console.log("edushi转3857---", center);
+        center = ol.proj.transform(center, 'EPSG:3857', 'EPSG:4326');
+      //  console.log("3857-4326--", center);
+        center = ol.proj.transform(center, 'EPSG:4326', 'EPSG:3857');
+      //  console.log("4326转3857---", center);
+        var mp = new ol.control.MousePosition({
+            coordinateFormat:function(coord){
+                var p = ol.proj.transform(o.rat_ori(coord), "EPSG:3857", "EPSG:4326");
+               return p;
+            }
+        });
 
         var source = new ol.source.Vector({wrapX: false});
        
@@ -155,7 +118,7 @@ var highLightVecLayer = new ol.layer.Vector({
 	 
 	 	tianDiTuLayer = o.loadXYZLayerTiandDiTu();
 	 	tianDiTuLayer_label = o.loadXYZLayerTiandDiTu_label();
-	 	eDuShiLayer = o.loadNewEduShiLayer();
+	 	eDuShiLayer = o.loadXYZLayerCustom();
 		wmsLayer = new ol.layer.Tile({
 			source: new ol.source.TileWMS({
 				url: 'http://localhost:9999/geoserver/wms',
@@ -165,15 +128,10 @@ var highLightVecLayer = new ol.layer.Vector({
 		});
 
 		var wfsVectorSource = new ol.source.Vector({
-				format: new ol.format.GeoJSON({
-					defaultDataProjection:　"EPSG:3857",
-					featureProjection: 'EPSG:4326'
-				}),
+				format: new ol.format.GeoJSON(),
 				url: function(extent) {
-					extent = ol.proj.transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
-					console.log(extent);
-				return 'http://118.178.125.174:9999/geoserver/wfs?service=WFS&' +
-					'version=1.1.0&request=GetFeature&typename=ww:xianceshi&' +
+				return 'http://localhost:9999/geoserver/wfs?service=WFS&' +
+					'version=1.1.0&request=GetFeature&typename=ww:ceshiyh&' +
 					'outputFormat=application/json&srsname=EPSG:3857&' +
 					'bbox=' + extent.join(',') + ',EPSG:3857';
 				},
@@ -185,19 +143,16 @@ var highLightVecLayer = new ol.layer.Vector({
 			source: wfsVectorSource,
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
-					color: 'rgba(0, 0, 255, 0.0)',
+					color: 'rgba(0, 0, 255, 0)',
 					width: 2
 				}),
 				fill: new ol.style.Fill({
-					color: 'rgba(144,144,0, 0.0)'
+					color: 'rgba(144,144,0, 0)'
 				})
 
 			})
 		});
 
-		var dd = ol.proj.transform([108.938670, 34.250293], "EPSG:4326", "EPSG:3857");
-		var center = o.ori_rat(dd)
-		console.log(dd);
 	    map = new ol.Map({
 	        interactions: ol.interaction.defaults({
 	            doubleClickZoom: false,
@@ -206,35 +161,25 @@ var highLightVecLayer = new ol.layer.Vector({
 	        }),
 	        target: document.getElementById('map'),
 	        layers: [
-	            eDuShiLayer,
-				tianDiTuLayer,
-				tianDiTuLayer_label,
-				vector,  
-				wfsLayer,
-				highLightVecLayer
+	            eDuShiLayer,tianDiTuLayer,tianDiTuLayer_label,vector,  wfsLayer
+	            //, o.createChinaGrid()
 	        ],
 	        view: new ol.View({
-				center:  [108.938670, 34.250293],
-				resolutions: resolutions,
-				// resolution:    2.682199829602067E-6,
-			    projection:　projection,
-				zoom: 16,
-				// zoom: 13,
-	            maxZoom: 19,
+	             center: center,
+	            zoom: GlobalObj.map.zoom,
+	            maxZoom: GlobalObj.map.maxZoom,
+	            minZoom: GlobalObj.map.minZoom
 		        }),
 	        controls:[
-				mp
+	                mp
 	        ]
 	    });
 
-	    var defaultStyle = new ol.style.Style(
-			{
-				fill: new ol.style.Fill({
-					color: 'rgba(255,33,33,0.0)'
-				})
-			}
-		);
-
+	    var defaultStyle = new ol.style.Style({
+					 		fill: new ol.style.Fill({
+			       				color: 'rgba(255,33,33,0.0)'
+			       			})
+					 	});
 	   	var lastHigthLightFeature ;
 	    map.on('pointermove', function(e){
 	    	if(measureActivated){
@@ -271,7 +216,6 @@ var highLightVecLayer = new ol.layer.Vector({
 		       }
 	    });
 
-		
         return map;
     };
    

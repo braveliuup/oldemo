@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.2.0/css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <!--<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>-->
+    <script src="https://openlayers.org/en/v4.2.0/build/ol.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            var projection = ol.proj.get('EPSG:4326');
+            var origin = [-400.0, 400];
+            var resolutions = [
+                0.7031250000029744,
+                0.3515625000014872,
+                0.1757812499888463,
+                0.08789062499442316,
+                0.04394531250910888,
+                0.021972656242657134,
+                0.010986328121328567,
+                0.00549316407256159,
+                0.0027465820243834896,
+                0.0013732910240890498,
+                6.866455120445249E-4,
+                3.433227441249574E-4,
+                1.7166138395978374E-4,
+                8.583068008258684E-5,
+                4.291534004129342E-5,
+                2.145767002064671E-5,
+                9.658089455004757E-6,
+                5.364423453814192E-6,
+                2.682199829602067E-6,
+				1.3411118121060625E-6,
+            ];
+            var tileGrid = new ol.tilegrid.TileGrid({
+                tileSize: 256,
+                origin: origin,
+                resolutions: resolutions
+            });
+
+            var map = new ol.Map({
+                target: 'map',
+                layers: [
+                   //new ol.layer.Tile({
+                   //    //瓦片的数据源
+                   //    source: new ol.source.OSM(),
+                   //}),
+                   new ol.layer.Tile({
+                       source: new ol.source.TileImage({
+                           projection: projection,
+                           tileGrid: tileGrid,
+                           tileUrlFunction: function (tileCoord, pixelRatio, proj) {
+                               var z = zeroPad(tileCoord[0], 2, 10);
+                               var x = zeroPad(tileCoord[1], 8, 16);
+                               var y = zeroPad(-tileCoord[2] - 1, 8, 16);
+                               return "http://localhost:8080/oldemo/hmp0-19/" + "L" + z + "/" + "R" + y + "/" + "C" + x + ".png";
+                           }
+                       }),
+                   }),
+                ],
+                view: new ol.View({
+                    center: [108.934625, 34.292462],
+                    resolutions: resolutions,
+                    resolution: 3.433227441249574E-4,
+                    projection: projection,
+					maxZoom: 19,
+                })
+            });
+           
+            function zeroPad(num, len, radix) {
+                var str = num.toString(radix || 10);
+                while (str.length < len) {
+                    str = "0" + str;
+                }
+                return str;
+            }
+		
+        };
+    </script>
+</head>
+<body>
+    <div id="map"></div>
+</body>
+</html>

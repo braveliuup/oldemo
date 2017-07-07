@@ -57,23 +57,21 @@ $('#debug_activeDistance').on('click', function(){
 });
 
 $('#debug_2dot5d').on('click', function(){
-    var c = ol.proj.transform([108.938444, 34.250250], 'EPSG:4326', 'EPSG:3857');
-    var center = c;// MapManger.ori_rat(c);
+    var c = ol.proj.transform([108.90536,  34.28138], 'EPSG:4326', 'EPSG:3857');
+    var center = MapManger.ori_rat(c);
     tianDiTuLayer.setVisible(false);
     tianDiTuLayer_label.setVisible(false);
     eDuShiLayer.setVisible(true);
-    map.getView().setZoom(13);
+    map.getView().setZoom(19);
     map.getView().setCenter(center);
 })
 
 $('#debug_2d').on('click', function(){
-   var coor = ol.proj.transform([12127232.12689691, 4061596.2420750097], 'EPSG:3857', 'EPSG:4326');
-   console.log(coor)
-  // tianDiTuLayer.setVisible(true);
-  // tianDiTuLayer_label.setVisible(true);
-  // eDuShiLayer.setVisible(false);
-  //  map.getView().setZoom(1);
-  
+  var coor = ol.proj.transform([116.40969, 39.89945], 'EPSG:4326', 'EPSG:3857');
+  tianDiTuLayer.setVisible(true);
+  tianDiTuLayer_label.setVisible(true);
+  eDuShiLayer.setVisible(false);
+  map.getView().setZoom(13);
   map.getView().setCenter(coor);
 
 })
@@ -151,69 +149,17 @@ function showLabelOnLayer(layerName){
   $('.'+layerName).removeClass('hideElement');
 }
 
-// wfs查询结果
-// generate a GetFeature request
-function createGetFeatureRequest(querystr){
-  var featureRequest = new ol.format.WFS().writeGetFeature({
-    srsName: 'EPSG:3857',
-    featurePrefix: 'ww',
-    featureTypes: ['xianceshi-web'],
-    outputFormat: 'application/json',
-    filter: ol.format.filter.or(
-      ol.format.filter.like('NAME',  querystr),
-      ol.format.filter.like('ADDRESS', querystr)
-    )
-  });
-  return featureRequest;
-}
-
-
-// post the request and  add the received features to a layer
-function DoWFSQuery() {
-  highLightVecSource.clear();
-  var querystr = $('#query_string').val().trim();
-  if(querystr === '') {
-    return;
-  }
-  querystr += '*';
-  var featureRequest = createGetFeatureRequest(querystr);
-  var bodyReq = new XMLSerializer().serializeToString(featureRequest); 
-  console.log(bodyReq)
-  $.ajax({
-    type: 'POST',
-    url: 'http://118.178.125.174:9999/geoserver/wfs',
-    data: bodyReq,
-    contentType: 'application/json',
-    datType: 'json',
-    success: function (data) {
-      var features = new ol.format.GeoJSON({
-        defaultDataProjection:　"EPSG:3857",
-        featureProjection: 'EPSG:4326'
-      }).readFeatures(data);
-      highLightVecSource.addFeatures(features);
-      map.getView().fit(highLightVecSource.getExtent());
-    },
-    error: function (data) {
-      alert(data);
-    }
-  });
-}
-
-$('#debug_query').on('click', function() {
-  DoWFSQuery();
-})
-
 $('#x_test').on('click', function(){
   console.log(wfsLayer)
   wfsLayer.setVisible(false);
 })
 
 $('#debug_addImageOnLayer').on('click', function(){
-  addImageOnLayer('测试图层', 108.934625, 34.292462);
+  addImageOnLayer('测试图层', 108.905, 34.281);
 });
 
 $('#debug_addLabelOnLayer').on('click', function(){
-  addLabelOnLayer('测试图层', 108.934625, 34.292462, '搜狐大厦');
+  addLabelOnLayer('测试图层', 108.905, 34.2814, '搜狐大厦');
 });
 
 $('#debug_hideLabelOnLayer').on('click', function(){
@@ -296,34 +242,40 @@ function createLabelOverlay(coord, title) {
 
 var delMark;
 var delLbl;
-var markSource = new ol.source.Vector();
-var markLayer = new ol.layer.Vector({
-  style: function(feature){
-    return feature.get('style');
-  },
-  source: markSource
-})
+  var markSource = new ol.source.Vector();
+  var markLayer = new ol.layer.Vector({
+    style: function(feature){
+      return feature.get('style');
+    },
+    source: markSource
+  })
 
-map.getLayers().push(markLayer);   
+  map.getLayers().push(markLayer);   
 function markPlace(evt){
-    $('#us_infoWnd_title').val('');
-    $('#us_infoWnd_remark').val('');
-    var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer){
-      return feature;
-    });
-    if(feature){
-      var titleInfo = feature.get('title');
-      var remarkInfo = feature.get('remark');
-      $('#us_infoWnd_title').val(titleInfo);
-      $('#us_infoWnd_remark').val(remarkInfo);  
-      delMark = feature;
-    }
-    var coordinate = evt.coordinate;
-    var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
-    coordinate, 'EPSG:4326', 'EPSG:4326'));
-    // content.innerHTML = '<p>You clicked here:</p><code>' + hdms +
-      //   '</code>';
-    overlay.setPosition(coordinate);
+  // console.log(evt)
+  // var geopoint = ol.proj.transform(MapManger.rat_ori(evt.coordinate), sourceProj, 'EPSG:4326');
+  // var iconFeature = new ol.Feature(new ol.geom.Point(evt.coordinate));
+  // iconFeature.set('style', createStyle('images/pin_red.png', undefined));
+  // markSource.addFeature(iconFeature);
+       $('#us_infoWnd_title').val('');
+       $('#us_infoWnd_remark').val('');
+       var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer){
+          return feature;
+        });
+       if(feature){
+          var titleInfo = feature.get('title');
+          var remarkInfo = feature.get('remark');
+          $('#us_infoWnd_title').val(titleInfo);
+          $('#us_infoWnd_remark').val(remarkInfo);  
+          delMark = feature;
+       }
+       var coordinate = evt.coordinate;
+       var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
+        coordinate, 'EPSG:3857', 'EPSG:4326'));
+       // content.innerHTML = '<p>You clicked here:</p><code>' + hdms +
+         //   '</code>';
+        overlay.setPosition(coordinate);
+        
 }
 
 function createStyle(src, img) {
@@ -556,6 +508,7 @@ function createHelpTooltip() {
   map.addOverlay(helpTooltip);
 }
 
+
 /**
  * Creates a new measure tooltip
  */
@@ -601,15 +554,15 @@ map.on('dblclick', function(evt){
 
 // 坐标转换
 function geo2edsWorld(lon, lat){
-    // var pos = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
-    var center = [lon, lat]; //MapManger.ori_rat(pos);
+    var pos = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
+    var center = MapManger.ori_rat(pos);
     return center;
 }
 
 // 接口 加载图标 参数：经度，纬度，图片地址url，名称，地址
 function ExAddIcon(lon, lat, picUrl, jid, name, address){
-	// var pos = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
-  	var center = [lon, lat]; //MapManger.ori_rat(pos);
+	var pos = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
+  	var center = MapManger.ori_rat(pos);
 	var iconFeature = new ol.Feature({
     	geometry: new ol.geom.Point(center),
     	NAME: name,
@@ -627,23 +580,23 @@ function ExAddIcon(lon, lat, picUrl, jid, name, address){
     	})
   	});
 	iconFeature.setStyle(iconStyle);
-	var source = map.getLayers().item(4).getSource();
+	var source = map.getLayers().item(1).getSource();
   console.log(source);
 	source.addFeature(iconFeature);
 }
 
 // 接口 定位 参数：经度，纬度，缩放级别(14-19)
 function ExLocate(lon, lat, zoom){
-	// var c = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
-  	var center = [lon, lat];// MapManger.ori_rat(c);
+	var c = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
+  	var center = MapManger.ori_rat(c);
   	var view = map.getView();
-  	view.setCenter(center);
   	view.setZoom(zoom);
+  	view.setCenter(center);
 }
 
 function ExAddLabel(lon, lat, text){
-  // var pos = ol.proj.transform(, 'EPSG:4326', 'EPSG:3857');
-  var coord = [lon, lat];
+  var pos = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
+  var coord = MapManger.ori_rat(pos);
 
   var lblEle = document.createElement('div');
   lblEle.className = 'labeltip';
@@ -661,18 +614,18 @@ function ExAddLabel(lon, lat, text){
 
 // 添加图片测试
 $("#debug_addIcon").on("click", function(){
-	var lon = 108.938444, lat = 34.250250, picUrl = "data/icon.png", name = "这里表示图片名称", address = "这里表示地址名称";
+	var lon = 108.90536, lat = 34.28138, picUrl = "data/icon.png", name = "这里表示图片名称", address = "这里表示地址名称";
 	ExAddIcon(lon, lat, picUrl, 'JID001', name, address);
 })
 
 // 定位测试
 $("#debug_locate").on('click', function(){
-    var lon = 108.938444, lat = 34.250250, zoom = 16;
+    var lon = 108.90536, lat = 34.28138, zoom = 19;
     ExLocate(lon, lat, zoom);// api 定位接口
 })
 
 // 添加标注
 $('#debug_label').on('click', function(){
-    var lon = 108.938444, lat = 34.250250, text="腾讯大厦";
+    var lon = 108.90536, lat = 34.28138, text="腾讯大厦";
     ExAddLabel(lon, lat, text);
 })
