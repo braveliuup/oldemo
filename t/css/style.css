@@ -180,7 +180,7 @@ button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0;}
     height: 100%;
     width: 100%;
     background: #ccc;
-    background-image: url(../images/bg_img.jpg);
+    
     cursor: default;
     clear: both;
     position: relative;

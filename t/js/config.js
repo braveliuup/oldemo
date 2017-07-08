@@ -1,6 +1,8 @@
 ﻿var GlobalObj = {
     map: {
-        pic: 'http://localhost:8080/data/',
+        pic: 'http://118.178.125.174:9999/data/hmp0-19/',
+        geoserver: 'http://118.178.125.174:9999/geoserver/',
+        typename: 'ww:xianceshi',
         center:[108.90536, 34.28138],
         zoom: 14, // 14
         maxZoom: 24,

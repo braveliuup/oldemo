@@ -2,7 +2,6 @@
 
 //地图相关操作类
 var MapManger = {};
-var measureActivated = false;
 var tianDiTuLayer;
 var tianDiTuLayer_label;
 var eDuShiLayer;
@@ -102,7 +101,7 @@ var highLightVecLayer = new ol.layer.Vector({
 				var z = o.zeroPad(tileCoord[0], 2, 10);
 				var x = o.zeroPad(tileCoord[1], 8, 16);
 				var y = o.zeroPad(-tileCoord[2] - 1, 8, 16);
-				return "http://localhost:8080/oldemo/hmp0-19/" + "L" + z + "/" + "R" + y + "/" + "C" + x + ".png";
+				return GlobalObj.map.pic + "L" + z + "/" + "R" + y + "/" + "C" + x + ".png";
 			}
 		});
 		return new ol.layer.Tile({
@@ -130,6 +129,16 @@ var highLightVecLayer = new ol.layer.Vector({
     }
     //地图初始化
     o.init = function () {
+		
+	   	var lastHigthLightFeature ;
+	    var defaultStyle = new ol.style.Style(
+			{
+				fill: new ol.style.Fill({
+					color: 'rgba(255,33,33,0.0)'
+				})
+			}
+		);
+		
         var mp = new ol.control.MousePosition();
 
         var source = new ol.source.Vector({wrapX: false});
@@ -156,13 +165,13 @@ var highLightVecLayer = new ol.layer.Vector({
 	 	tianDiTuLayer = o.loadXYZLayerTiandDiTu();
 	 	tianDiTuLayer_label = o.loadXYZLayerTiandDiTu_label();
 	 	eDuShiLayer = o.loadNewEduShiLayer();
-		wmsLayer = new ol.layer.Tile({
-			source: new ol.source.TileWMS({
-				url: 'http://localhost:9999/geoserver/wms',
-				params: {'LAYERS': 'ww:ceshiyh', 'TILED': true},
-				serverType: 'geoserver'
-			})
-		});
+		// wmsLayer = new ol.layer.Tile({
+		// 	source: new ol.source.TileWMS({
+		// 		url: 'http://localhost:9999/geoserver/wms',
+		// 		params: {'LAYERS': 'ww:ceshiyh', 'TILED': true},
+		// 		serverType: 'geoserver'
+		// 	})
+		// });
 
 		var wfsVectorSource = new ol.source.Vector({
 				format: new ol.format.GeoJSON({
@@ -171,9 +180,8 @@ var highLightVecLayer = new ol.layer.Vector({
 				}),
 				url: function(extent) {
 					extent = ol.proj.transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
-					console.log(extent);
-				return 'http://118.178.125.174:9999/geoserver/wfs?service=WFS&' +
-					'version=1.1.0&request=GetFeature&typename=ww:xianceshi&' +
+				return GlobalObj.map.geoserver + '/wfs?service=WFS&' +
+					'version=1.1.0&request=GetFeature&typename='+GlobalObj.map.typename+'&' +
 					'outputFormat=application/json&srsname=EPSG:3857&' +
 					'bbox=' + extent.join(',') + ',EPSG:3857';
 				},
@@ -195,9 +203,6 @@ var highLightVecLayer = new ol.layer.Vector({
 			})
 		});
 
-		var dd = ol.proj.transform([108.938670, 34.250293], "EPSG:4326", "EPSG:3857");
-		var center = o.ori_rat(dd)
-		console.log(dd);
 	    map = new ol.Map({
 	        interactions: ol.interaction.defaults({
 	            doubleClickZoom: false,
@@ -216,10 +221,8 @@ var highLightVecLayer = new ol.layer.Vector({
 	        view: new ol.View({
 				center:  [108.938670, 34.250293],
 				resolutions: resolutions,
-				// resolution:    2.682199829602067E-6,
 			    projection:　projection,
 				zoom: 16,
-				// zoom: 13,
 	            maxZoom: 19,
 		        }),
 	        controls:[
@@ -227,17 +230,8 @@ var highLightVecLayer = new ol.layer.Vector({
 	        ]
 	    });
 
-	    var defaultStyle = new ol.style.Style(
-			{
-				fill: new ol.style.Fill({
-					color: 'rgba(255,33,33,0.0)'
-				})
-			}
-		);
-
-	   	var lastHigthLightFeature ;
 	    map.on('pointermove', function(e){
-	    	if(measureActivated){
+	    	if(map.measureActivated){
     		   if(lastHigthLightFeature){
 		       	lastHigthLightFeature.setStyle(defaultStyle);
 		       }
@@ -270,7 +264,6 @@ var highLightVecLayer = new ol.layer.Vector({
 	       			);
 		       }
 	    });
-
 		
         return map;
     };

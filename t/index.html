@@ -16,7 +16,7 @@
     <script src="libs/jquery/jquery-2.1.4.min.js"></script>
     <script src="libs/jquery/jquery.page.js"></script>
     <!--<script src="libs/ol3121/js/ol-debug.js"></script>-->
-    <script src="https://openlayers.org/en/v4.2.0/build/ol.js"></script>
+    <script src="libs/ol4.2.0/build/ol.js"></script>
     <script src="libs/bootstrap.min.js"></script>
     <script src="js/common.js"></script>
     <style>
@@ -140,14 +140,8 @@
     </div>
 
     <div id="map" class="map" tabindex="0">
-      <!--  <div id="location"></div>
-        <div id="zoom"></div>-->
-       
+   
     </div>
-
-   <!--   <div id="toolbar" style="position:absolute;left:10px;top:80px">
-        <img id="disBtn" src="images/distance_measure.png" title="测距" style="cursor:pointer"/>            
-    </div> -->
    
     <div id="debugDiv" style="position:absolute;left:44px;top:4px">
            <button id="x_test">临时测试</button>
@@ -182,17 +176,23 @@
               <input type="text" id="query_string">
               <button id="debug_query">查询</button>
             </div>
+            <hr>
+            <div style="background-color: rgba(255, 255, 255, 0.8);padding:20px;">
+              <span>要素点击接口>></span>
+              <button onclick="api.registFeaturSingleClick">注册要素单击回调</button>
+              <button onclick="api.registFeatureDoubleClick">注册要素双击回调</button>
+            </div>
 
     </div>
-                
-    
-  <!--   <div class="piex">
-        <a id="zoomin"><img src="./images/zoomin64.png" /></a>
-        <a id="zoomout"><img src="./images/zoomout64.png" /></a>
-    </div> -->
+
+    <script src="js/log.js"></script>
     <script src="js/config.js"></script>
     <script src="js/mapHelper.js"></script>
     <script src="js/init.js"></script>
+    
+    <script src="js/popup.js"></script>
+    <script src="js/featureClick.js"></script>
+    <script src="js/api_v1.js"></script>
     <script src="js/api.js"></script>
 </body>
 
