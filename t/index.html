@@ -13,11 +13,14 @@
     <link href="libs/ol3121/css/ol.css" rel="stylesheet" />
     <link href="libs/jquery/jquery.page.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="libs/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-switch.min.css">
     <script src="libs/jquery/jquery-2.1.4.min.js"></script>
     <script src="libs/jquery/jquery.page.js"></script>
     <!--<script src="libs/ol3121/js/ol-debug.js"></script>-->
+    <!--<script src="libs/ol4.2.0/build/ol.js"></script>-->
     <script src="libs/ol4.2.0/build/ol.js"></script>
     <script src="libs/bootstrap.min.js"></script>
+    <script src="libs/bootstrap-switch.min.js"></script>
     <script src="js/common.js"></script>
     <style>
 /*    .ol-mouse-position {
@@ -45,6 +48,7 @@
         opacity: 1;
         white-space: nowrap;
         font-weight: bold;
+        z-index: 1;
       }
       .tooltip-measure {
         opacity: 1;
@@ -140,49 +144,53 @@
     </div>
 
     <div id="map" class="map" tabindex="0">
-   
     </div>
    
-    <div id="debugDiv" style="position:absolute;left:44px;top:4px">
-           <button id="x_test">临时测试</button>
-            <button id="debug_locate" >测试-API定位</button>
-            <button id="debug_addIcon" >测试-添加图片点</button>
-            <button id="debug_activeDistance">测试-激活测距</button>
-            <button id="debug_mark">测试-激活标记</button>
-            <button id="debug_label">测试-添加标注</button>
-            <button id="debug_2dot5d">测试-2.5维地图</button>
-            <button id="debug_2d">测试-二位地图</button>
-            <br/>
-            <div  style="background-color:aliceblue">
-                测试-图层管理
-                <br>
-                <button id="debug_addLayer">添加图层</button>
-                <button id="debug_removeLayer">删除图层</button>
-                <button id="debug_hideLayer">隐藏图层</button>
-                <button id="debug_showLayer">显示图层</button>
-                <button id="debug_addImageOnLayer">增加图片点</button>
-                <br>
-                图片图层与标注点图层是不同类型的图层。要分开加载
-                <br>
-                <button id="debug_addLabelOnLayer">增加文本标注点</button>
-                <button id="debug_hideLabelOnLayer">隐藏文本标注点</button>
-                <button id="debug_showLabelOnLayer">显示文本标注点</button>
-                <div id='layerDiv'>
-                </div>
+    <div id="debugDiv" style="position:absolute;left:10px;top:4px;font-family:微软雅黑;font-size:12px;font-weight:bold;">
+            <div style="background-color: rgba(255, 255, 255, 0.8);width:100px;height:50px;float:left;font-size:16px;border:2px solid #bbb">
+              Debug面板-调试用
             </div>
-            <hr>
-            <div style="background-color: rgba(255, 255, 255, 0.8);padding:20px;">
-              <span>搜索接口>></span>
-              <input type="text" id="query_string">
-              <button id="debug_query">查询</button>
+            <div style="float:left;width:400px;">
+              <div style="background-color: rgba(255, 255, 255, 0.8);padding:10px;border-top:1px solid #ccc">
+                <span style="color:#E83015;">漫游接口>></span>
+                <input  type="text" id="locate_string" value="108.943519,34.253074,16">(经度,纬度,zoom) 
+                <button onclick="debug_locate();">定位</button>
+              </div>
+              <div style="background-color: rgba(255, 255, 255, 0.8);padding:10px;border-top:1px solid #ccc;">
+                <span style="color:#E83015;">标绘接口>></span>
+                <button onclick="debug_addIcon();" >添加图片点</button>
+                <button onclick="debug_addLabel();">添加标注</button>
+              </div>
+              <div style="background-color: rgba(255, 255, 255, 0.8);padding:10px;border-top:1px solid #ccc;">
+                <span style="color:#E83015;">自主标注接口>></span>
+                <input id="debug_mark" type="checkbox" name="switch-checkbox" data-size="mini">
+              </div>
+              <div style="background-color: rgba(255, 255, 255, 0.8);padding:10px;border-top:1px solid #ccc;">
+                <span style="color:#E83015;">测距接口>></span>
+                <input id="debug_measureDis" type="checkbox" name="switch-checkbox" data-size="mini">
+              </div>
+              <div style="background-color: rgba(255, 255, 255, 0.8);padding:10px;border-top:1px solid #ccc;">
+                <span style="color:#E83015;">自定义图层管理接口>></span>
+                <button onclick="debug_addLayer();">添加图层</button>
+                <button onclick="debug_addImageOnLayer();">添加图片点到图层</button>
+                <button onclick="debug_hideLayer();">隐藏图层</button>
+                <button onclick="debug_showLayer();">显示图层</button>
+                <button onclick="debug_removeLayer();">删除图层</button>
+                <button onclick="debug_addLabelOnLayer();">添加标签文本</button>
+                <button onclick="debug_hideLabelOnLayer();">隐藏标签文本</button>
+                <button onclick="debug_showLabelOnLayer();">显示标签文本</button>
+              </div>
+              <div style="background-color: rgba(255, 255, 255, 0.8);padding:10px;border-top:1px solid #ccc;">
+                <span style="color:#E83015;">搜索接口>></span>
+                <input type="text" id="query_string">
+                <button onclick="debug_query();">查询</button>
+              </div>
+              <div style="background-color: rgba(255, 255, 255, 0.8);padding:10px;border-top:1px solid #ccc;">
+                <span style="color:#E83015;">要素点击接口>></span>
+                <button onclick="debug_registFeaturSingleClick();">注册要素单击回调</button>
+                <button onclick="debug_registFeatureDoubleClick();">注册要素双击回调</button>
+              </div>
             </div>
-            <hr>
-            <div style="background-color: rgba(255, 255, 255, 0.8);padding:20px;">
-              <span>要素点击接口>></span>
-              <button onclick="api.registFeaturSingleClick">注册要素单击回调</button>
-              <button onclick="api.registFeatureDoubleClick">注册要素双击回调</button>
-            </div>
-
     </div>
 
     <script src="js/log.js"></script>
@@ -191,9 +199,10 @@
     <script src="js/init.js"></script>
     
     <script src="js/popup.js"></script>
+    <script src="js/mark.js"></script>
     <script src="js/featureClick.js"></script>
     <script src="js/api_v1.js"></script>
-    <script src="js/api.js"></script>
+    <script src="js/debug.js"></script>
 </body>
 
 </html>

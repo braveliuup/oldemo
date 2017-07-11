@@ -26,7 +26,7 @@ var com_popup = {
     show: function (coordinate, innerHTML) {
         if(!this.initialized)
             this.init(); 
-        this.content.innerHTML = '<p>adsfasd</p><code>sadfdf</code>'
+        this.content.innerHTML = innerHTML;
         this.overlay.setPosition(coordinate);
     }
 }

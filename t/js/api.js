@@ -150,58 +150,6 @@ function showLabelOnLayer(layerName) {
   $('.' + layerName).removeClass('hideElement');
 }
 
-// wfs查询结果
-// generate a GetFeature request
-function createGetFeatureRequest(querystr) {
-  var featureRequest = new ol.format.WFS().writeGetFeature({
-    srsName: 'EPSG:3857',
-    featurePrefix: 'ww',
-    featureTypes: ['xianceshi-web'],
-    outputFormat: 'application/json',
-    filter: ol.format.filter.or(
-      ol.format.filter.like('NAME', querystr),
-      ol.format.filter.like('ADDRESS', querystr)
-    )
-  });
-  return featureRequest;
-}
-
-
-// post the request and  add the received features to a layer
-function DoWFSQuery() {
-  highLightVecSource.clear();
-  var querystr = $('#query_string').val().trim();
-  if (querystr === '') {
-    return;
-  }
-  querystr += '*';
-  var featureRequest = createGetFeatureRequest(querystr);
-  var bodyReq = new XMLSerializer().serializeToString(featureRequest);
-  console.log(bodyReq)
-  $.ajax({
-    type: 'POST',
-    url: GlobalObj.map.geoserver + '/wfs',
-    data: bodyReq,
-    contentType: 'application/json',
-    datType: 'json',
-    success: function (data) {
-      var features = new ol.format.GeoJSON({
-        defaultDataProjection: "EPSG:3857",
-        featureProjection: 'EPSG:4326'
-      }).readFeatures(data);
-      highLightVecSource.addFeatures(features);
-      map.getView().fit(highLightVecSource.getExtent());
-    },
-    error: function (data) {
-      alert(data);
-    }
-  });
-}
-
-$('#debug_query').on('click', function () {
-  DoWFSQuery();
-})
-
 $('#x_test').on('click', function () {
   console.log(wfsLayer)
   wfsLayer.setVisible(false);

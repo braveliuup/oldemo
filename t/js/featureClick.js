@@ -1,7 +1,8 @@
+//require('log.js')
 // 要素单击事件
 map.on('singleclick', function (evt) {
     if (map.measureActivated || map.markActivated) {
-        alert('你正处于激活标绘状态，请先关闭标绘状态')
+        _log.info('自主标绘或测距已激活，要素暂不响应点击')
         return;
     }
     var feature = map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
@@ -11,14 +12,13 @@ map.on('singleclick', function (evt) {
         var propObj = feature.getProperties();
         _log.info(propObj);
         var copyObj = _propObjCopy(propObj);
-        if(api.registFeaturSingleClick)
-            api.registFeaturSingleClick(evt.coordinate, copyObj)
+        api.FeatureSingleClick(evt.coordinate, copyObj)
     }
 });
 // 要素双击事件
 map.on('dblclick', function (evt) {
     if (map.measureActivated || map.markActivated) {
-        alert('你正处于激活标绘状态，请先关闭标绘状态')
+        _log.info('自主标绘或测距状态已激活，要素暂不响应点击')
         return;
     }
     var feature = map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
@@ -27,8 +27,7 @@ map.on('dblclick', function (evt) {
     if (feature) {
         var propObj = feature.getProperties();
         var copyObj = _propObjCopy(propObj);
-        if(api.registFeaturDoubleClick)
-            api.registFeaturDoubleClick(evt.coordinate, copyObj)
+        api.FeatureDoubleClick(evt.coordinate, copyObj)
     }
 });
 

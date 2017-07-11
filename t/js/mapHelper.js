@@ -6,6 +6,7 @@ var tianDiTuLayer;
 var tianDiTuLayer_label;
 var eDuShiLayer;
 var wfsLayer;
+var defaultVectorLayer;
 var projection  = ol.proj.get('EPSG:4326');
 var origin = [-400.0, 400];
 var resolutions = [
@@ -36,9 +37,9 @@ var tileGrid = new ol.tilegrid.TileGrid({
 	resolutions: resolutions
 });
 
-var highLightVecSource = new ol.source.Vector();
-var highLightVecLayer = new ol.layer.Vector({
-	source: highLightVecSource,
+var queryHighLightVecSource = new ol.source.Vector();
+var queryHighLightVecLayer = new ol.layer.Vector({
+	source: queryHighLightVecSource,
 	style: new ol.style.Style({
 		fill: new ol.style.Fill({
 			color: 'rgba(255, 0, 0, .5)'
@@ -161,6 +162,7 @@ var highLightVecLayer = new ol.layer.Vector({
 	          })
 	        })
 	      });
+		defaultVectorLayer = vector;
 	 
 	 	tianDiTuLayer = o.loadXYZLayerTiandDiTu();
 	 	tianDiTuLayer_label = o.loadXYZLayerTiandDiTu_label();
@@ -216,7 +218,7 @@ var highLightVecLayer = new ol.layer.Vector({
 				tianDiTuLayer_label,
 				vector,  
 				wfsLayer,
-				highLightVecLayer
+				queryHighLightVecLayer
 	        ],
 	        view: new ol.View({
 				center:  [108.938670, 34.250293],
