@@ -1,4 +1,3 @@
-//require('log.js')
 // 要素单击事件
 map.on('singleclick', function (evt) {
     if (map.measureActivated || map.markActivated) {

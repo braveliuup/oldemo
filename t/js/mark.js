@@ -6,10 +6,13 @@ var com_mark = {
     delLbl: null,
     markSource: null,
     closer: null,
+    popup: null,
+    markIdIdx: 0,
+    markIdName: 'marklayer',
     init: function () {
-        var container = document.getElementById('popup');
-        this.content = document.getElementById('popup-content');
-        var closer = document.getElementById('popup-closer');
+        var container = document.getElementById('mark-popup');
+        this.content = document.getElementById('mark-popup-content');
+        var closer = document.getElementById('mark-popup-closer');
         var overlay = new ol.Overlay({
             element: container,
             autoPan: true,
@@ -35,6 +38,7 @@ var com_mark = {
         this.markSource = markSource;
         this.overlay = overlay;
         this.closer = closer;
+        this.popup = container;
         this._save();
         this._delete();
         this.initialized = true;
@@ -46,13 +50,14 @@ var com_mark = {
             var remarkInfo = $('#us_infoWnd_remark').val();
             var coordinate = that.overlay.getPosition();
             var iconFeature = new ol.Feature(new ol.geom.Point(coordinate));
+            iconFeature.setId(that.markIdName+(that.markIdIdx++));
             iconFeature.set('style', that._createStyle('images/pin_red.png', undefined));
             that.markSource.addFeature(iconFeature);
             iconFeature.setProperties({
                 title: titleInfo,
                 remark: remarkInfo
             })
-            that.delLbl = that._createLabelOverlay(coordinate, titleInfo);
+            that.delLbl = that._createLabelOverlay(coordinate, titleInfo, iconFeature.getId());
             that._closePopup();
         })
     },
@@ -76,23 +81,25 @@ var com_mark = {
             that._closePopup();
             if (that.delMark ) {
                 var f = that.markSource.getFeatureById(that.delMark.getId());
+                var o = map.getOverlayById(that.delMark.getId());
                 if(f != null){
                     that.markSource.removeFeature(f);
-                    that.delMark = null;
                 }
-            }
-            if (that.delLbl) {
-                that.delLbl.parentElement.removeChild(that.delLbl);
+                if( o != null) {
+                    map.removeOverlay(o);
+                }
+                that.delMark = null;
             }
         })
     },
-    _createLabelOverlay: function (coord, title) {
+    _createLabelOverlay: function (coord, title, id) {
         if (!title) {
             return;
         }
         var lblEle = document.createElement('div');
         lblEle.className = 'labeltip';
         var lblOverlay = new ol.Overlay({
+            id: id,
             element: lblEle,
             offset: [0, -25],
             positioning: 'bottom-center'
@@ -111,18 +118,21 @@ var com_mark = {
             return feature;
         });
         if (feature) {
-            var titleInfo = feature.get('title');
-            var remarkInfo = feature.get('remark');
-            $('#us_infoWnd_title').val(titleInfo);
-            $('#us_infoWnd_remark').val(remarkInfo);
-            this.delMark = feature;
+            var selectedFeature = this.markSource.getFeatureById(feature.getId());
+            if(selectedFeature){
+                var titleInfo = selectedFeature.get('title');
+                var remarkInfo = selectedFeature.get('remark');
+                $('#us_infoWnd_title').val(titleInfo);
+                $('#us_infoWnd_remark').val(remarkInfo);
+                this.delMark = selectedFeature;
+            }
         }
         var coordinate = evt.coordinate;
-        _log.debug(coordinate)
-        var features = his.markSource.getFeaturesAtCoordinate(coordinate);
-        _log.debug(features)
-        var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
-            coordinate, 'EPSG:4326', 'EPSG:4326'));
+        var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(coordinate, 'EPSG:4326', 'EPSG:4326'));
         this.overlay.setPosition(coordinate);
+        this.popup.style.display = 'block'
     }
+
 } 
+
+//  module.exports = com_mark;

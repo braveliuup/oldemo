@@ -1,4 +1,3 @@
-// require('api.js')
 function debug_locate() {
     var queryStr = $('#locate_string').val().trim();
     if (queryStr === '') return;
@@ -31,7 +30,7 @@ $('input[name="switch-checkbox"]').on('switchChange.bootstrapSwitch', function(e
         state? api.ActiveMark() : api.DeactiveMark();
     }
     if(this.id === 'debug_measureDis'){
-        state? api.ActiveMeasureDis : api.DeactiveMeasureDis();
+        state? api.ActiveMeasureDis() : api.DeactiveMeasureDis();
     }
 });
 
@@ -94,4 +93,9 @@ function debug_registFeaturSingleClick() {
 
 function debug_registFeatureDoubleClick() {
     api.RegistFeatureDoubleClick();
+}
+
+// 轨迹回放接口测试
+function debug_trackReplay() {
+    var data = ""; //测试数据
 }

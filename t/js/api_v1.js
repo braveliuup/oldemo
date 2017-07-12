@@ -1,5 +1,3 @@
-// require('popup.js')
-// require('mark.js')
 var api = {
     b_isRegistFeatureSigClick: false,
     b_isRegistFeatureDblClick: false,
@@ -54,6 +52,7 @@ var api = {
     },
     ActiveMark: function () { // 激活自主标绘
         map.markActivated = true;
+        this.DeactiveMeasureDis();
         map.on('singleclick',this.common.markPlace);
     },
     DeactiveMark: function () { // 取消激活自主标绘
@@ -62,9 +61,12 @@ var api = {
     },
     ActiveMeasureDis: function () {
         map.measureActivated = true;
+        this.DeactiveMark();
+        com_disMeasure.activeMeasureDis();
     },
     DeactiveMeasureDis: function() {
         map.measureActivated = false;
+        com_disMeasure.deactiveMeasureDis();
     },
     AddLayer: function (layerName) {
         if (this.layerManager[layerName] != null) {
@@ -155,6 +157,7 @@ var api = {
             alert('请先注册要素点击接口');
             return;
         }
+        _log.debug(propObj);
         var html = this.common.createFeatureInfo(propObj);
         com_popup.show(coordinate, html);
     }, 
@@ -171,12 +174,19 @@ var api = {
     },
     common: {
         createFeatureInfo: function (propObj) {
-            var html = "<p>要素信息</p>";
-            var requireFields = ['Color', 'JID', 'QKID', 'STID', 'NAME', 'ADDRESS', 'STPHOTO', 'PICTURE'];
-            requireFields.forEach(function (item) {
-                html+= '<p>'+item+':'+propObj[item]+'</p>';
-            });
-            html+='<p>图片示例(./images/hot/5.jpg):<img src="./images/hot/5.jpg" ></img></p>'
+            var html = "";
+            var requireFields = ['FID_', 'Color', 'JID', 'QKID', 'STID', 'NAME', 'ADDRESS', 'STPHOTO', 'PICTURE'];
+            // requireFields.forEach(function (item) {
+            //     html+= '<p>'+item+':'+propObj[item]+'</p>';
+            // });
+            var picDir = propObj['QKID'].substr(3,3)
+            var picName = 'DSCN'+ MapManger.zeroPad(propObj['PICTURE'], 4)+'.JPG';
+            var pic = './xianlianhuqu/'+picDir+'/'+picName;
+            html+='<p><img  src="'+pic+'" ></img></p>'+
+                '<table border="1" cellpadding="0" cellspacing="0"><tr><td>JID</td><td>'+propObj['JID']+'</td></tr>'+
+                '<tr><td>Name</td><td>'+propObj['NAME']+'</td></tr>'+
+                '<tr><td>Address</td><td>'+propObj['ADDRESS']+'</td></tr>'+
+                '</table>'
             return html;
         },
         createGetFeatureRequest: function (querystr) { // generate a GetFeature request
@@ -194,10 +204,10 @@ var api = {
         },
         createDefaultIconStyle: function (){
             return new ol.style.Style({
-                image: new ol.style.Icon(/** @type {olx.style.IconOptions} */({
+                image: new ol.style.Icon({
                     anchor: [0.5, 0.96],
                     src: 'images/pin_red.png'
-                }))
+                })
             });
         },
         markPlace: function (evt) {

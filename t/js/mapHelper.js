@@ -1,6 +1,5 @@
-﻿/// <reference path="common.js" />
+// import GlobalObj from './config';
 
-//地图相关操作类
 var MapManger = {};
 var tianDiTuLayer;
 var tianDiTuLayer_label;
@@ -47,7 +46,7 @@ var queryHighLightVecLayer = new ol.layer.Vector({
 	})
 });
 
-(function (o) {
+function InitMapManager (o) {
 	
    	o.loadXYZLayerTiandDiTu = function(){
    		var layer = new ol.layer.Tile({
@@ -270,5 +269,11 @@ var queryHighLightVecLayer = new ol.layer.Vector({
         return map;
     };
    
-})(MapManger);
+};
+InitMapManager(MapManger);
+
+var map  = MapManger.init();
+
+
+
 

@@ -6,3 +6,4 @@ var _log = {
         console.log(data)
     }
 }
+// module.exports = _log;

@@ -2,10 +2,11 @@ var com_popup = {
     overlay: null,
     content: null,
     initialized: false,
+    popup: null,
     init: function () {
-        var container = document.getElementById('popup');
-        this.content = document.getElementById('popup-content');
-        var closer = document.getElementById('popup-closer');
+        var container = document.getElementById('feature-popup');
+        this.content = document.getElementById('feature-popup-content');
+        var closer = document.getElementById('feature-popup-closer');
         var overlay = new ol.Overlay({
             element: container,
             autoPan: true,
@@ -20,6 +21,7 @@ var com_popup = {
         };
         map.addOverlay(overlay);
         this.overlay = overlay;
+        this.popup = container;
         this.initialized = true;
     },
 
@@ -28,5 +30,10 @@ var com_popup = {
             this.init(); 
         this.content.innerHTML = innerHTML;
         this.overlay.setPosition(coordinate);
-    }
+        this.popup.style.display = 'block'
+    }       
+
 }
+
+// module.exports = com_popup;
+

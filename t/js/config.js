@@ -1,4 +1,4 @@
-﻿var GlobalObj = {
+var GlobalObj = {
     map: {
         pic: 'http://118.178.125.174:9999/data/hmp0-19/',
         geoserver: 'http://118.178.125.174:9999/geoserver/',
@@ -11,3 +11,5 @@
         minZoom:13 // 14
     }
 }
+
+// module.exports = GlobalObj;
